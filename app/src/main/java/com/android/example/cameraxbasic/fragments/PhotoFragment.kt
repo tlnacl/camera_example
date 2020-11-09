@@ -127,23 +127,6 @@ class PhotoFragment : Fragment() {
         }
     }
 
-    /**
-     * We need a display listener for orientation changes that do not trigger a configuration
-     * change, for example if we choose to override config change in manifest or for 180-degree
-     * orientation changes.
-     */
-    private val displayListener = object : DisplayManager.DisplayListener {
-        override fun onDisplayAdded(displayId: Int) = Unit
-        override fun onDisplayRemoved(displayId: Int) = Unit
-        override fun onDisplayChanged(displayId: Int) = view?.let { view ->
-            if (displayId == this@PhotoFragment.displayId) {
-                Log.d(TAG, "Rotation changed: ${view.display.rotation}")
-                imageCapture?.targetRotation = view.display.rotation
-                imageAnalyzer?.targetRotation = view.display.rotation
-            }
-        } ?: Unit
-    }
-
     override fun onResume() {
         super.onResume()
         // Make sure that all permissions are still present, since the
@@ -163,7 +146,6 @@ class PhotoFragment : Fragment() {
 
         // Unregister the broadcast receivers and listeners
         broadcastManager.unregisterReceiver(volumeDownReceiver)
-        displayManager.unregisterDisplayListener(displayListener)
     }
 
     override fun onCreateView(
@@ -204,9 +186,6 @@ class PhotoFragment : Fragment() {
         // Set up the intent filter that will receive events from our main activity
         val filter = IntentFilter().apply { addAction(KEY_EVENT_ACTION) }
         broadcastManager.registerReceiver(volumeDownReceiver, filter)
-
-        // Every time the orientation of device changes, update rotation for use cases
-        displayManager.registerDisplayListener(displayListener, null)
 
         // Determine the output directory
         outputDirectory = MainActivity.getOutputDirectory(requireContext())
