@@ -35,6 +35,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.MimeTypeMap
+import android.widget.Button
 import android.widget.ImageButton
 import androidx.camera.core.*
 import androidx.camera.core.ImageCapture.*
@@ -432,6 +433,14 @@ class VideoFragment : Fragment() {
                 // Re-bind use cases to update selected camera
                 bindCameraUseCases()
             }
+        }
+
+        val photoVideoSwitch = controls.findViewById<Button>(R.id.photoVideoSwitch)
+        photoVideoSwitch.text = "Video"
+        photoVideoSwitch.setOnClickListener {
+            Navigation.findNavController(
+                    requireActivity(), R.id.fragment_container
+            ).navigate(VideoFragmentDirections.actionVideoToPhoto())
         }
     }
 

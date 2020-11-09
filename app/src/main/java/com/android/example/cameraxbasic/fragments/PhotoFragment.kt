@@ -36,6 +36,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.MimeTypeMap
+import android.widget.Button
 import android.widget.ImageButton
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.Camera
@@ -89,7 +90,7 @@ typealias LumaListener = (luma: Double) -> Unit
  * - Photo taking
  * - Image analysis
  */
-class CameraFragment : Fragment() {
+class PhotoFragment : Fragment() {
 
     private lateinit var container: ConstraintLayout
     private lateinit var viewFinder: PreviewView
@@ -135,7 +136,7 @@ class CameraFragment : Fragment() {
         override fun onDisplayAdded(displayId: Int) = Unit
         override fun onDisplayRemoved(displayId: Int) = Unit
         override fun onDisplayChanged(displayId: Int) = view?.let { view ->
-            if (displayId == this@CameraFragment.displayId) {
+            if (displayId == this@PhotoFragment.displayId) {
                 Log.d(TAG, "Rotation changed: ${view.display.rotation}")
                 imageCapture?.targetRotation = view.display.rotation
                 imageAnalyzer?.targetRotation = view.display.rotation
@@ -149,7 +150,7 @@ class CameraFragment : Fragment() {
         // user could have removed them while the app was in paused state.
         if (!PermissionsFragment.hasPermissions(requireContext())) {
             Navigation.findNavController(requireActivity(), R.id.fragment_container).navigate(
-                    CameraFragmentDirections.actionCameraToPermissions()
+                    PhotoFragmentDirections.actionCameraToPermissions()
             )
         }
     }
@@ -475,7 +476,7 @@ class CameraFragment : Fragment() {
             if (true == outputDirectory.listFiles()?.isNotEmpty()) {
                 Navigation.findNavController(
                         requireActivity(), R.id.fragment_container
-                ).navigate(CameraFragmentDirections
+                ).navigate(PhotoFragmentDirections
                         .actionCameraToGallery(outputDirectory.absolutePath))
             }
         }
@@ -494,6 +495,14 @@ class CameraFragment : Fragment() {
                         bindCameraUseCases()
                     }
                 }
+
+        val photoVideoSwitch = controls.findViewById<Button>(R.id.photoVideoSwitch)
+        photoVideoSwitch.text = "Photo"
+        photoVideoSwitch.setOnClickListener {
+            Navigation.findNavController(
+                    requireActivity(), R.id.fragment_container
+            ).navigate(PhotoFragmentDirections.actionPhotoToVideo())
+        }
     }
 
     /** Enabled or disabled a button to switch cameras depending on the available cameras */

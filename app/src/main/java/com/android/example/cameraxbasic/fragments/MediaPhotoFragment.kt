@@ -29,7 +29,7 @@ import java.io.File
 
 
 /** Fragment used for each individual page showing a photo inside of [GalleryFragment] */
-class MediaFragment internal constructor() : Fragment() {
+class MediaPhotoFragment internal constructor() : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?) = ImageView(context)
@@ -38,17 +38,14 @@ class MediaFragment internal constructor() : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val args = arguments ?: return
         val resource = args.getString(FILE_NAME_KEY)?.let { File(it) } ?: R.drawable.ic_photo
-        if (resource is File && resource.extension.equals("mp4", true)) {
-
-        }
-        Log.d("TAG", "onViewCreated resource: $resource")
+        Log.d("MediaPhotoFragment", "onViewCreated resource: $resource")
         Glide.with(view).load(resource).into(view as ImageView)
     }
 
     companion object {
         private const val FILE_NAME_KEY = "file_name"
 
-        fun create(image: File) = MediaFragment().apply {
+        fun create(image: File) = MediaPhotoFragment().apply {
             arguments = Bundle().apply {
                 putString(FILE_NAME_KEY, image.absolutePath)
             }

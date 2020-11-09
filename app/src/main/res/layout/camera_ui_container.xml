@@ -73,7 +73,7 @@
         app:srcCompat="@drawable/ic_flash_off" />
 
     <Button
-        android:id="@+id/video"
+        android:id="@+id/photoVideoSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin_xsmall"
