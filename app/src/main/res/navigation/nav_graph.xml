@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2020 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<navigation
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
     app:startDestination="@id/permissions_fragment">
@@ -23,7 +21,7 @@
     <fragment
         android:id="@+id/permissions_fragment"
         android:name="com.android.example.cameraxbasic.fragments.PermissionsFragment"
-        android:label="PermissionsFragment" >
+        android:label="PermissionsFragment">
 
         <action
             android:id="@+id/action_permissions_to_camera"
@@ -36,7 +34,7 @@
     <fragment
         android:id="@+id/video_fragment"
         android:name="com.android.example.cameraxbasic.fragments.VideoFragment"
-        android:label="VideoFragment" >
+        android:label="VideoFragment">
 
         <action
             android:id="@+id/action_camera_to_gallery"
@@ -46,7 +44,7 @@
             android:id="@+id/action_camera_to_permissions"
             app:destination="@id/permissions_fragment"
             app:popUpTo="@id/video_fragment"
-            app:popUpToInclusive="true"/>
+            app:popUpToInclusive="true" />
 
         <action
             android:id="@+id/action_video_to_photo"
@@ -57,7 +55,7 @@
     <fragment
         android:id="@+id/photo_fragment"
         android:name="com.android.example.cameraxbasic.fragments.PhotoFragment"
-        android:label="PhotoFragment" >
+        android:label="PhotoFragment">
 
         <action
             android:id="@+id/action_camera_to_gallery"
@@ -67,7 +65,7 @@
             android:id="@+id/action_camera_to_permissions"
             app:destination="@id/permissions_fragment"
             app:popUpTo="@id/photo_fragment"
-            app:popUpToInclusive="true"/>
+            app:popUpToInclusive="true" />
 
         <action
             android:id="@+id/action_photo_to_video"
@@ -78,10 +76,24 @@
     <fragment
         android:id="@+id/gallery_fragment"
         android:name="com.android.example.cameraxbasic.fragments.GalleryFragment"
-        android:label="GalleryFragment" >
+        android:label="GalleryFragment">
         <argument
             android:name="root_directory"
             app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/cameraViewFragment"
+        android:name="com.android.example.cameraxbasic.fragments.CameraViewFragment"
+        android:label="CameraViewFragment">
+        <action
+            android:id="@+id/action_camera_to_gallery"
+            app:destination="@id/gallery_fragment" />
+
+        <action
+            android:id="@+id/action_camera_to_permissions"
+            app:destination="@id/permissions_fragment"
+            app:popUpTo="@id/cameraViewFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
 </navigation>

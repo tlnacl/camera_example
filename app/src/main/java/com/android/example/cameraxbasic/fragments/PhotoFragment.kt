@@ -97,7 +97,6 @@ class PhotoFragment : Fragment() {
     private lateinit var outputDirectory: File
     private lateinit var broadcastManager: LocalBroadcastManager
 
-    private var displayId: Int = -1
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
     private var flashMode: Int = FLASH_MODE_OFF
     private var preview: Preview? = null
@@ -105,10 +104,6 @@ class PhotoFragment : Fragment() {
     private var imageAnalyzer: ImageAnalysis? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
-
-    private val displayManager by lazy {
-        requireContext().getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
-    }
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
@@ -192,10 +187,6 @@ class PhotoFragment : Fragment() {
 
         // Wait for the views to be properly laid out
         viewFinder.post {
-
-            // Keep track of the display in which this view is attached
-            displayId = viewFinder.display.displayId
-
             // Build UI controls
             updateCameraUi()
 
