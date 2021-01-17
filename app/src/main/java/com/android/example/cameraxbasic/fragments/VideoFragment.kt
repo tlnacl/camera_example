@@ -30,10 +30,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.webkit.MimeTypeMap
 import android.widget.Button
 import android.widget.ImageButton
@@ -57,6 +54,7 @@ import com.android.example.cameraxbasic.utils.ANIMATION_FAST_MILLIS
 import com.android.example.cameraxbasic.utils.ANIMATION_SLOW_MILLIS
 import com.android.example.cameraxbasic.utils.simulateClick
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.ImageHeaderParser
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -81,6 +79,7 @@ import kotlin.math.min
  */
 class VideoFragment : Fragment() {
 
+    private var currentOrientation: Int = Surface.ROTATION_0
     private lateinit var container: ConstraintLayout
     private lateinit var viewFinder: PreviewView
     private lateinit var outputDirectory: File
@@ -326,8 +325,10 @@ class VideoFragment : Fragment() {
                     Log.d(TAG, "stopRecording")
                     imageCapture.stopRecording()
                     videoing = false
+                    it.isSelected = false
                 } else {
                     videoing = true
+                    it.isSelected = true
                     // Create output file to hold the image
                     val photoFile = createFile(outputDirectory, FILENAME, VIDEO_EXTENSION)
 
@@ -376,17 +377,6 @@ class VideoFragment : Fragment() {
                             }
                         }
                     })
-
-                    // We can only change the foreground Drawable using API level 23+ API
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-                        // Display flash animation to indicate that photo was captured
-                        container.postDelayed({
-                            container.foreground = ColorDrawable(Color.WHITE)
-                            container.postDelayed(
-                                    { container.foreground = null }, ANIMATION_FAST_MILLIS)
-                        }, ANIMATION_SLOW_MILLIS)
-                    }
                 }
             }
         }
@@ -462,6 +452,27 @@ class VideoFragment : Fragment() {
     /** Returns true if the device has an available front camera. False otherwise */
     private fun hasFrontCamera(): Boolean {
         return cameraProvider?.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA) ?: false
+    }
+
+    //https://developer.android.com/training/camerax/orientation-rotation
+    private val orientationEventListener by lazy {
+        object : OrientationEventListener(requireContext()) {
+            @SuppressLint("RestrictedApi")
+            override fun onOrientationChanged(orientation: Int) {
+                if (orientation == ImageHeaderParser.UNKNOWN_ORIENTATION) {
+                    return
+                }
+
+                val rotation = when (orientation) {
+                    in 45 until 135 -> Surface.ROTATION_270
+                    in 135 until 225 -> Surface.ROTATION_180
+                    in 225 until 315 -> Surface.ROTATION_90
+                    else -> Surface.ROTATION_0
+                }
+                currentOrientation = rotation
+                videoCapture?.setTargetRotation(rotation)
+            }
+        }
     }
 
     companion object {
