@@ -25,7 +25,7 @@
 
         <action
             android:id="@+id/action_permissions_to_camera"
-            app:destination="@id/video_fragment"
+            app:destination="@id/cameraViewFragment"
             app:popUpTo="@id/permissions_fragment"
             app:popUpToInclusive="true" />
 

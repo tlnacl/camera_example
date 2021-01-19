@@ -25,6 +25,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.content.Intent
 import android.widget.FrameLayout
 import com.android.example.cameraxbasic.utils.FLAGS_FULLSCREEN
+import java.text.SimpleDateFormat
+import java.util.*
 
 const val KEY_EVENT_ACTION = "key_event_action"
 const val KEY_EVENT_EXTRA = "key_event_extra"
@@ -74,5 +76,10 @@ class MainActivity : AppCompatActivity() {
             return if (mediaDir != null && mediaDir.exists())
                 mediaDir else appContext.filesDir
         }
+
+        /** Helper function used to create a timestamped file */
+        fun createFile(baseFolder: File, format: String, extension: String) =
+                File(baseFolder, SimpleDateFormat(format, Locale.US)
+                        .format(System.currentTimeMillis()) + extension)
     }
 }

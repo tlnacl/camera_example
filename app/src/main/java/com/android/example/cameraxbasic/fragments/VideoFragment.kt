@@ -49,6 +49,7 @@ import androidx.navigation.Navigation
 import com.android.example.cameraxbasic.KEY_EVENT_ACTION
 import com.android.example.cameraxbasic.KEY_EVENT_EXTRA
 import com.android.example.cameraxbasic.MainActivity
+import com.android.example.cameraxbasic.MainActivity.Companion.createFile
 import com.android.example.cameraxbasic.R
 import com.android.example.cameraxbasic.utils.ANIMATION_FAST_MILLIS
 import com.android.example.cameraxbasic.utils.ANIMATION_SLOW_MILLIS
@@ -88,10 +89,13 @@ class VideoFragment : Fragment() {
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
     private var flashMode: Int = FLASH_MODE_OFF
     private var preview: Preview? = null
+    private var imageCapture: ImageCapture? = null
     private var videoCapture: VideoCapture? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private var videoing: Boolean = false
+
+    private var isVideo = true
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
@@ -320,10 +324,10 @@ class VideoFragment : Fragment() {
         // Listener for button used to capture photo
         controls.findViewById<ImageButton>(R.id.camera_capture_button).setOnClickListener {
             // Get a stable reference of the modifiable image capture use case
-            videoCapture?.let { imageCapture ->
+            videoCapture?.let { capture ->
                 if (videoing) {
                     Log.d(TAG, "stopRecording")
-                    imageCapture.stopRecording()
+                    capture.stopRecording()
                     videoing = false
                     it.isSelected = false
                 } else {
@@ -332,14 +336,12 @@ class VideoFragment : Fragment() {
                     // Create output file to hold the image
                     val photoFile = createFile(outputDirectory, FILENAME, VIDEO_EXTENSION)
 
-
                     // Create output options object which contains file + metadata
                     val outputOptions = VideoCapture.OutputFileOptions.Builder(photoFile).build()
 
-
                     // Setup image capture listener which is triggered after photo has been taken
                     Log.d(TAG, "startRecording")
-                    imageCapture.startRecording(
+                    capture.startRecording(
                             outputOptions, cameraExecutor, object : VideoCapture.OnVideoSavedCallback {
                         override fun onError(videoCaptureError: Int, message: String, cause: Throwable?) {
                             Log.e(TAG, "Video capture failed: ${cause?.message}", cause)
@@ -482,10 +484,5 @@ class VideoFragment : Fragment() {
         private const val VIDEO_EXTENSION = ".mp4"
         private const val RATIO_4_3_VALUE = 4.0 / 3.0
         private const val RATIO_16_9_VALUE = 16.0 / 9.0
-
-        /** Helper function used to create a timestamped file */
-        private fun createFile(baseFolder: File, format: String, extension: String) =
-                File(baseFolder, SimpleDateFormat(format, Locale.US)
-                        .format(System.currentTimeMillis()) + extension)
     }
 }
