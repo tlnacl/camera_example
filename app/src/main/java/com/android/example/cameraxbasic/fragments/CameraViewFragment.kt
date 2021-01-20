@@ -19,6 +19,7 @@ import com.android.example.cameraxbasic.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.otaliastudios.cameraview.*
+import com.otaliastudios.cameraview.controls.Flash
 import com.otaliastudios.cameraview.controls.Mode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,9 +27,10 @@ import java.io.File
 import java.util.*
 
 class CameraViewFragment : Fragment() {
-    lateinit var camera: CameraView
+    lateinit var cameraView: CameraView
     private lateinit var container: ConstraintLayout
     private lateinit var photoVideoSwitch: Button
+    private lateinit var captureButton: Button
     private lateinit var cameraSwitch: ImageButton
     private lateinit var outputDirectory: File
 
@@ -41,36 +43,51 @@ class CameraViewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         container = view.findViewById(R.id.camera_container)
-        camera = view.findViewById(R.id.camera);
+        cameraView = view.findViewById(R.id.camera_view);
+        captureButton = view.findViewById(R.id.camera_capture_button)
         photoVideoSwitch = view.findViewById(R.id.photoVideoSwitch);
         cameraSwitch = view.findViewById(R.id.camera_switch_button);
-        camera.setLifecycleOwner(viewLifecycleOwner)
-        camera.addCameraListener(Listener())
+        cameraView.setLifecycleOwner(viewLifecycleOwner)
+        cameraView.addCameraListener(Listener())
 
         // Determine the output directory
         outputDirectory = MainActivity.getOutputDirectory(requireContext())
 
         updateCameraUi()
-        cameraSwitch.setOnClickListener { camera.toggleFacing() }
+//        camera.cameraOptions.supportedFacing
+        cameraSwitch.setOnClickListener { cameraView.toggleFacing() }
         photoVideoSwitch.setOnClickListener {
-            if (camera.mode == Mode.PICTURE) {
-                camera.mode = Mode.VIDEO
+            if (cameraView.mode == Mode.PICTURE) {
+                cameraView.mode = Mode.VIDEO
             } else {
-                camera.mode = Mode.PICTURE
+                cameraView.mode = Mode.PICTURE
             }
             updateCameraUi()
         }
 
-        view.findViewById<ImageButton>(R.id.camera_capture_button).setOnClickListener {
+        view.findViewById<ImageButton>(R.id.flash_button)?.let { imageButton ->
+            imageButton.setOnClickListener {
+                Log.d(TAG, "updateCameraUi: imageButton clicked")
+                when (cameraView.flash) {
+                    Flash.AUTO -> cameraView.flash = Flash.OFF
+                    Flash.OFF -> cameraView.flash = Flash.ON
+                    Flash.ON -> cameraView.flash = Flash.AUTO
+                    else -> Flash.OFF
+                }
+            }
+        }
+
+        captureButton.setOnClickListener {
             when {
-                camera.isTakingVideo -> camera.stopVideo()
-                camera.isTakingPicture -> {
+                cameraView.isTakingVideo -> cameraView.stopVideo()
+                cameraView.isTakingPicture -> {
                 }// ignore
                 else -> {
-                    if (camera.mode == Mode.PICTURE) camera.takePicture()
+                    if (cameraView.mode == Mode.PICTURE) cameraView.takePicture()
                     else {
+                        captureButton.isSelected = true
                         val file = MainActivity.createFile(outputDirectory, FILENAME, VIDEO_EXTENSION)
-                        camera.takeVideo(file)
+                        cameraView.takeVideo(file)
                     }
                 }
             }
@@ -100,7 +117,7 @@ class CameraViewFragment : Fragment() {
 
 
         override fun onPictureTaken(result: PictureResult) {
-            if (camera.isTakingVideo) {
+            if (cameraView.isTakingVideo) {
                 Log.d(TAG, "Image capture while isTakingVideo")
                 return
             }
@@ -114,6 +131,7 @@ class CameraViewFragment : Fragment() {
         override fun onVideoTaken(result: VideoResult) {
             super.onVideoTaken(result)
             Log.d(TAG, "Video capture succeeded")
+            captureButton.isSelected = false
             handleResultFile(result.file)
         }
 
@@ -149,7 +167,7 @@ class CameraViewFragment : Fragment() {
             }
         }
 
-        photoVideoSwitch.text = if (camera.mode == Mode.PICTURE) "Photo" else "Video"
+        photoVideoSwitch.text = if (cameraView.mode == Mode.PICTURE) "Photo" else "Video"
     }
 
     private fun setGalleryThumbnail(uri: Uri) {

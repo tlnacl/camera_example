@@ -7,7 +7,7 @@
     android:background="@android:color/black">
 
     <com.otaliastudios.cameraview.CameraView
-        android:id="@+id/camera"
+        android:id="@+id/camera_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:cameraEngine="camera1"
